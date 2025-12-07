@@ -2,12 +2,12 @@
 // 1. Ve a https://console.firebase.google.com/
 // 2. Crea un proyecto, añade una web app y copia los datos aquí:
 const firebaseConfig = {
-    apiKey: "TU_API_KEY_AQUI",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "NUMEROS",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyCRPL6GMK3v31ovbw8JQP1MdnhkEREs7hQ",
+  authDomain: "sede-nacional-dnis.firebaseapp.com",
+  projectId: "sede-nacional-dnis",
+  storageBucket: "sede-nacional-dnis.firebasestorage.app",
+  messagingSenderId: "615396622610",
+  appId: "1:615396622610:web:f48197f61c41ce7df9f3cb"
 };
 
 // Inicializar Firebase
