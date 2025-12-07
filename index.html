@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema DNI - Servidor Peninsula</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase SDK (Versión modular compatible con script simple) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+
+    <!-- VISTA 1: LOGIN -->
+    <div id="login-view" class="login-body">
+        <div class="login-container">
+            <h2 style="color: var(--cnp-blue);">SISTEMA DNI</h2>
+            <p>Identificación requerida</p>
+            <div class="input-group">
+                <label>NÚMERO DE PLACA / CLAVE</label>
+                <input type="password" id="badge-input" placeholder="Ej: CNP-Peninsula001">
+            </div>
+            <button class="btn-login" onclick="handleLogin()">ACCEDER</button>
+            <p style="margin-top: 20px; font-size: 12px; color: #666;">
+                ¿Eres ciudadano? <a href="#" style="color: var(--accent);" onclick="showRequestForm()">Solicitar DNI</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- VISTA 2: SOLICITUD PÚBLICA -->
+    <div id="request-view" class="login-body hidden">
+        <div class="login-container" style="width: 400px;">
+            <h2 style="color: var(--cnp-blue);">SOLICITUD DE DNI</h2>
+            <div class="input-group">
+                <label>NOMBRE COMPLETO (IC)</label>
+                <input type="text" id="req-name" placeholder="Nombre y Apellidos">
+            </div>
+            <div class="input-group">
+                <label>FECHA DE NACIMIENTO</label>
+                <input type="date" id="req-dob">
+            </div>
+            <div class="input-group">
+                <label>FOTO (URL)</label>
+                <input type="text" id="req-photo" placeholder="Link de Discord o Imgur">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-blue" onclick="submitRequest()">ENVIAR SOLICITUD</button>
+                <button class="btn btn-red" onclick="showLogin()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA 3: DASHBOARD DEL SISTEMA -->
+    <div id="dashboard-view" class="hidden">
+        <nav class="navbar">
+            <div class="nav-brand" id="user-badge-display">CNP - SISTEMA CENTRAL</div>
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </nav>
+
+        <div class="main-container">
+            <!-- Panel Izquierdo: Lista y Filtros -->
+            <div class="panel left">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Buscar por Nombre o DNI..." onkeyup="filterList()">
+                </div>
+                
+                <!-- Pestañas -->
+                <div class="tabs" style="margin-bottom: 10px; display: flex; gap: 10px;">
+                    <button class="btn btn-blue" onclick="loadCitizens()">CIUDADANOS</button>
+                    <button class="btn btn-orange" id="btn-solicitudes" onclick="loadRequests()">SOLICITUDES PENDIENTES</button>
+                </div>
+
+                <div class="list-container" id="list-render">
+                    <!-- Aquí se cargan los datos desde JS -->
+                </div>
+            </div>
+
+            <!-- Panel Derecho: Detalles -->
+            <div class="panel right">
+                <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px;">DETALLES DEL SUJETO</h3>
+                <div id="details-panel">
+                    <p style="color: #666; text-align: center; margin-top: 50px;">Selecciona un registro para ver detalles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
