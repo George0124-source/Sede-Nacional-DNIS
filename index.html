@@ -5,46 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema DNI - Servidor Peninsula</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Iconos -->
+    <!-- Iconos FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Firebase SDK (Versión modular compatible con script simple) -->
+    
+    <!-- Firebase SDK (Versión 8 modular para compatibilidad simple) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
-    <!-- VISTA 1: LOGIN -->
+    <!-- =========================================
+         VISTA 1: LOGIN (ACCESO POLICIAL/ADMIN)
+    ========================================== -->
     <div id="login-view" class="login-body">
         <div class="login-container">
             <h2 style="color: var(--cnp-blue);">SISTEMA DNI</h2>
             <p>Identificación requerida</p>
+            
             <div class="input-group">
-                <label>NÚMERO DE PLACA / CLAVE</label>
-                <input type="password" id="badge-input" placeholder="Ej: CNP-Peninsula001">
+                <label>NÚMERO DE PLACA / CLAVE ACCESO</label>
+                <!-- Input limpio, sin ejemplos feos -->
+                <input type="password" id="badge-input" placeholder="Introduce tu clave autorizada...">
             </div>
+            
             <button class="btn-login" onclick="handleLogin()">ACCEDER</button>
+            
             <p style="margin-top: 20px; font-size: 12px; color: #666;">
                 ¿Eres ciudadano? <a href="#" style="color: var(--accent);" onclick="showRequestForm()">Solicitar DNI</a>
             </p>
         </div>
     </div>
 
-    <!-- VISTA 2: SOLICITUD PÚBLICA -->
+    <!-- =========================================
+         VISTA 2: FORMULARIO DE SOLICITUD (PÚBLICO)
+    ========================================== -->
     <div id="request-view" class="login-body hidden">
         <div class="login-container" style="width: 400px;">
             <h2 style="color: var(--cnp-blue);">SOLICITUD DE DNI</h2>
+            
             <div class="input-group">
                 <label>NOMBRE COMPLETO (IC)</label>
-                <input type="text" id="req-name" placeholder="Nombre y Apellidos">
+                <input type="text" id="req-name" placeholder="Nombre y Apellidos del personaje">
             </div>
+            
             <div class="input-group">
                 <label>FECHA DE NACIMIENTO</label>
                 <input type="date" id="req-dob">
             </div>
+            
             <div class="input-group">
                 <label>FOTO (URL)</label>
-                <input type="text" id="req-photo" placeholder="Link de Discord o Imgur">
+                <input type="text" id="req-photo" placeholder="Enlace directo a imagen (Discord/Imgur)">
             </div>
+            
             <div class="action-buttons">
                 <button class="btn btn-blue" onclick="submitRequest()">ENVIAR SOLICITUD</button>
                 <button class="btn btn-red" onclick="showLogin()">CANCELAR</button>
@@ -52,41 +65,67 @@
         </div>
     </div>
 
-    <!-- VISTA 3: DASHBOARD DEL SISTEMA -->
+    <!-- =========================================
+         VISTA 3: DASHBOARD / SISTEMA PRINCIPAL
+    ========================================== -->
     <div id="dashboard-view" class="hidden">
+        <!-- Barra de Navegación Superior -->
         <nav class="navbar">
-            <div class="nav-brand" id="user-badge-display">CNP - SISTEMA CENTRAL</div>
+            <div class="nav-brand" id="user-badge-display">CARGANDO...</div>
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </nav>
 
         <div class="main-container">
-            <!-- Panel Izquierdo: Lista y Filtros -->
+            <!-- PANEL IZQUIERDO: Búsqueda, Filtros y Lista -->
             <div class="panel left">
+                
+                <!-- Buscador -->
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="Buscar por Nombre o DNI..." onkeyup="filterList()">
                 </div>
                 
-                <!-- Pestañas -->
+                <!-- Botones de Pestañas -->
                 <div class="tabs" style="margin-bottom: 10px; display: flex; gap: 10px;">
                     <button class="btn btn-blue" onclick="loadCitizens()">CIUDADANOS</button>
-                    <button class="btn btn-orange" id="btn-solicitudes" onclick="loadRequests()">SOLICITUDES PENDIENTES</button>
+                    <!-- Estos botones se muestran/ocultan según el rango (Admin) -->
+                    <button class="btn btn-orange" id="btn-solicitudes" onclick="loadRequests()" style="display:none;">SOLICITUDES</button>
+                    <button class="btn btn-purple" id="btn-placas" onclick="loadBadgesManage()" style="display:none;">GESTIONAR PLACAS</button>
                 </div>
 
+                <!-- FORMULARIO OCULTO: Crear Placas (Solo Admins) -->
+                <div id="badge-manager-view" class="hidden" style="padding: 15px; background: #252525; border-radius: 4px; margin-bottom: 10px; border: 1px solid #444;">
+                    <h4 style="margin-top:0; color: var(--text-main); border-bottom: 1px solid #444; padding-bottom: 5px;">AÑADIR NUEVA PLACA</h4>
+                    <input type="text" id="new-badge-id" placeholder="Clave/Placa (Ej: CNP-001)" style="margin-bottom: 8px;">
+                    
+                    <select id="new-badge-role" style="margin-bottom: 8px; background: #333; color: white; padding: 10px; width: 100%; border: 1px solid #444; border-radius: 4px;">
+                        <option value="viewer">Agente (Solo ver/buscar)</option>
+                        <option value="admin">Cúpula/Staff (Control total)</option>
+                    </select>
+                    
+                    <input type="text" id="new-badge-org" placeholder="Organización (Ej: CNP, GC, STAFF)" style="margin-bottom: 8px;">
+                    <button class="btn btn-green" onclick="createNewBadge()">CREAR PLACA</button>
+                </div>
+
+                <!-- Contenedor donde se pintan los resultados -->
                 <div class="list-container" id="list-render">
-                    <!-- Aquí se cargan los datos desde JS -->
+                    <!-- Aquí JS inserta los ciudadanos, solicitudes o placas -->
                 </div>
             </div>
 
-            <!-- Panel Derecho: Detalles -->
+            <!-- PANEL DERECHO: Detalles del Seleccionado -->
             <div class="panel right">
-                <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px;">DETALLES DEL SUJETO</h3>
+                <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0;">DETALLES</h3>
                 <div id="details-panel">
-                    <p style="color: #666; text-align: center; margin-top: 50px;">Selecciona un registro para ver detalles.</p>
+                    <p style="color: #666; text-align: center; margin-top: 50px;">
+                        <i class="fas fa-id-card" style="font-size: 40px; margin-bottom: 10px;"></i><br>
+                        Selecciona un registro de la izquierda para ver su información.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Vinculamos el Javascript -->
     <script src="script.js"></script>
 </body>
 </html>
