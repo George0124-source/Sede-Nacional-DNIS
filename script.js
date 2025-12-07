@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // 3. Pega aquí tu URL de Webhook de Discord (No el ID del canal, sino la URL completa)
-const DISCORD_WEBHOOK_URL = "TU_WEBHOOK_URL_AQUI"; 
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1446993873975906344/lmlMulhCxZyQ5qxKZt5mkZhcX957jcx0XJoiLF_dNY4IzRz1FTxxF7ZpHrmMIe9GGepX"; 
 
 // --- GESTIÓN DE ESTADO ---
 let currentUserBadge = null;
